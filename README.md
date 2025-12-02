@@ -26,4 +26,4 @@ I'll also post them on YouTube.
 
 
 
-[^1]: text text to ascii art generator by [patorjk.com](https://patorjk.com/software/taag/)
+[^1]: text text to ascii art generator by <a href="https://patorjk.com/software/taag/" target="_blank">patorjk.com</a>

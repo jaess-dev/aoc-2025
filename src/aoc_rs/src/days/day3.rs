@@ -21,7 +21,7 @@ fn solve_b(input: &str) -> i64 {
                     .map(|val| val.clone())
                     .collect();
                 let (tmp_start_idx, val) = largest_digit_with_idx(&col);
-                start_idx = tmp_start_idx + 1;
+                start_idx += tmp_start_idx + 1;
 
                 let intermediate = val as i64 * (10_i64.pow(i as u32));
                 result += intermediate;

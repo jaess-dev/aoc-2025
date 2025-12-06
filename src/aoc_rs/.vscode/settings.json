@@ -9,5 +9,6 @@
         "**/target": true,
         "**/.vscode": true,
         "**/Cargo.lock": true,
+        "**/banner": true,
     }
 }

@@ -13,7 +13,7 @@ fn read_random_banner(dir: &str) -> io::Result<String> {
     let path = Path::new(dir);
 
     // Collect all regular files
-    let mut files: Vec<_> = fs::read_dir(path)?
+    let files: Vec<_> = fs::read_dir(path)?
         .filter_map(|e| e.ok())
         .filter(|e| e.path().is_file())
         .collect();

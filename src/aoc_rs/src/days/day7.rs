@@ -56,7 +56,7 @@ fn solve_a(input: &str) -> i64 {
     starting_positions.insert((0_usize, idx));
 
     let mut split_count = 0;
-    for i in 0..grid.len() - 1 {
+    for _ in 0..grid.len() - 1 {
         let mut next_start_pos = HashSet::new();
         for (x, y) in starting_positions {
             let x = x + 1;

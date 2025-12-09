@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    ops::Index,
-};
+use std::collections::HashSet;
 
 use crate::aoc::aoc_day::AocDayData;
 
@@ -214,15 +211,6 @@ fn solve_a_for_test(input: &str, limit: usize) -> i64 {
         .fold(1, |acc, &next| acc * (next as i64))
 }
 
-fn create_table(own: &Vec<Circuit>) -> HashMap<Pos, &Circuit> {
-    let mut table = HashMap::<Pos, &Circuit>::new();
-    for c in own.iter() {
-        let el = c.iter().last().unwrap();
-        table.insert(*el, c);
-    }
-    table
-}
-
 fn dist(pos1: Pos, pos2: Pos) -> Num {
     fn term(x1: usize, x2: usize) -> Num {
         (x1 as Num - x2 as Num).pow(2)
@@ -233,9 +221,7 @@ fn dist(pos1: Pos, pos2: Pos) -> Num {
 
 #[cfg(test)]
 mod tests {
-    use crate::days::day8::solve_a_for_test;
-
-    use super::solve_a;
+    use super::solve_a_for_test;
     use super::solve_b;
 
     const TEST_INPUT: &str = "162,817,812

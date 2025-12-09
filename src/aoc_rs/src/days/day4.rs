@@ -71,7 +71,7 @@ fn get_neighbors<'a>(
     i: Option<usize>,
     j: usize,
     is_middle: bool,
-) -> Vec<&&'a str> {
+) -> Vec<&'a &'a str> {
     match i {
         None => vec![],
         Some(i) => {

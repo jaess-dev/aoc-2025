@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
@@ -27,6 +28,30 @@ impl Coord2D {
     fn calc_area(&self, end: &Coord2D) -> Num {
         (self.x as Num - end.x as Num + 1).abs() * (self.y as Num - end.y as Num + 1).abs()
     }
+}
+
+fn solve_a(input: &str) -> i64 {
+    let red_tiles = preprocess(input);
+
+    let mut areas = HashSet::new();
+    for start in red_tiles.iter() {
+        for end in red_tiles.iter() {
+            areas.insert(start.calc_area(end));
+        }
+    }
+
+    *areas.iter().max().unwrap()
+}
+
+fn preprocess(input: &str) -> Vec<Coord2D> {
+    let red_tiles = input
+        .split("\n")
+        .map(|line| {
+            let coord = line.split(",").collect::<Vec<&str>>();
+            Coord2D::new(coord[0].parse().unwrap(), coord[1].parse().unwrap())
+        })
+        .collect::<Vec<Coord2D>>();
+    red_tiles
 }
 
 type Loop<'a> = HashSet<&'a Coord2D>;
@@ -247,30 +272,6 @@ fn loop_creator<'a>(red_tiles: &'a Vec<Coord2D>, start: &'a Coord2D) -> Loop<'a>
     }
 
     loop_structure
-}
-
-fn solve_a(input: &str) -> i64 {
-    let red_tiles = preprocess(input);
-
-    let mut areas = HashSet::new();
-    for start in red_tiles.iter() {
-        for end in red_tiles.iter() {
-            areas.insert(start.calc_area(end));
-        }
-    }
-
-    *areas.iter().max().unwrap()
-}
-
-fn preprocess(input: &str) -> Vec<Coord2D> {
-    let red_tiles = input
-        .split("\n")
-        .map(|line| {
-            let coord = line.split(",").collect::<Vec<&str>>();
-            Coord2D::new(coord[0].parse().unwrap(), coord[1].parse().unwrap())
-        })
-        .collect::<Vec<Coord2D>>();
-    red_tiles
 }
 
 #[cfg(test)]

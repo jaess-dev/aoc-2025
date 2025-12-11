@@ -1,7 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+
 use std::{
     collections::{HashMap, HashSet},
     mem::take,
-    os::linux::raw::stat,
 };
 
 use crate::aoc::aoc_day::AocDayData;
@@ -112,7 +115,7 @@ fn solve_a(input: &str) -> i64 {
 #[cfg(test)]
 mod tests {
     use super::solve_a;
-    use super::solve_b;
+    // use super::solve_b;
 
     const TEST_INPUT: &str = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}

@@ -1,3 +1,4 @@
+pub(super) mod day10;
 pub(super) mod day2;
 pub(super) mod day3;
 pub(super) mod day4;

@@ -1,9 +1,110 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    default,
+};
 
 use crate::aoc::aoc_day::AocDayData;
 
 pub fn day11() -> AocDayData {
     AocDayData::new(11, "resources/day11".to_string(), solve_a, solve_b)
+}
+
+#[derive(Default)]
+struct Graph<'a> {
+    nodes: HashMap<&'a str, Vec<&'a str>>,
+}
+
+impl<'a> Graph<'a> {
+    pub fn add(&mut self, src: &'a str, dest: &'a str) {
+        if !self.nodes.contains_key(src) {
+            self.nodes.insert(src, vec![]);
+        }
+
+        self.nodes.get_mut(src).unwrap().push(dest);
+    }
+
+    pub fn count_paths(&self, start: &str, dest: &str) -> Num {
+        self.count_paths_excluding(start, dest, HashSet::new())
+    }
+
+    pub fn count_paths_excluding(&self, start: &str, dest: &str, exclude: HashSet<&str>) -> Num {
+        let mut current: HashMap<&str, Num> = self
+            .nodes
+            .get(start)
+            .expect(&format!("Called unwrap on {}", start))
+            .iter()
+            .map(|s| (*s, 1))
+            .collect();
+
+        let mut count = 0;
+        while !current.is_empty() {
+            let mut new_current = HashMap::new();
+            for (cur, cur_count) in current {
+                if exclude.contains(cur) {
+                    continue;
+                }
+                if cur == dest {
+                    count += cur_count;
+                    continue;
+                }
+                if cur == "out" {
+                    continue;
+                }
+
+                for &next in self.nodes.get(cur).unwrap() {
+                    new_current.insert(next, new_current.get(next).unwrap_or(&0) + cur_count);
+                }
+            }
+
+            current = new_current;
+        }
+
+        count
+    }
+}
+
+type Num = i64;
+
+fn solve_b(input: &str) -> Num {
+    let mut graph = input.split("\n").fold(Graph::default(), |mut acc, line| {
+        let parts = line.split(":").collect::<Vec<_>>();
+        let origin = parts[0];
+        let destination: Vec<&str> = parts[1].trim().split(" ").collect();
+
+        for dest in destination {
+            acc.add(origin, dest);
+        }
+
+        acc
+    });
+
+    // construct graph
+    // 1. find all ways from svr to fft and dac
+    // 2. find all ways from fft to dac and from dac to fft
+    // 3. find all ways from fft to out and all from dac to out
+    // 4. (svr -> fft) * (fft -> dac) * (dac -> out)
+    //    (svr -> dac) * (dac -> fft) * (fft -> out)
+
+    (graph.count_paths_excluding("svr", "fft", {
+        let mut set = HashSet::new();
+        set.insert("dac");
+        set
+    }) * graph.count_paths("fft", "dac")
+        * graph.count_paths_excluding("dac", "out", {
+            let mut set = HashSet::new();
+            set.insert("fft");
+            set
+        }))
+        + graph.count_paths_excluding("svr", "dac", {
+            let mut set = HashSet::new();
+            set.insert("fft");
+            set
+        }) * graph.count_paths("dac", "fft")
+            * graph.count_paths_excluding("fft", "out", {
+                let mut set = HashSet::new();
+                set.insert("dac");
+                set
+            })
 }
 
 fn solve_a(input: &str) -> Num {
@@ -39,74 +140,6 @@ fn solve_a(input: &str) -> Num {
     }
 
     node_list.iter().count() as Num
-}
-
-struct Tree {
-    root: Node,
-}
-
-struct Node {
-    children: Vec<Node>,
-}
-
-type Num = i64;
-
-fn solve_b(input: &str) -> Num {
-    let mut table =
-        input
-            .split("\n")
-            .fold(HashMap::<&str, HashSet<&str>>::new(), |mut acc, line| {
-                let parts = line.split(":").collect::<Vec<_>>();
-                let key = parts[0];
-                let values = parts[1].trim().split(" ").collect();
-
-                acc.insert(key, values);
-                acc
-            });
-
-    // path reduction removing 1:1 mappings
-    // FIXME: doesn't work, can't figure out why
-    // path_reduction(&mut table);
-
-    // build list with nodes that can never lead to dac or fft
-
-    // 1. build reverse table and starting nodes are "dac" and "fft", end node is "svr"
-    let reversed_table: HashMap<&str, HashSet<&str>> = build_reverse_table(&table);
-
-    // 2. find the paths similar to already constructed algorithm
-    let mut starting_points =
-        find_way_to_end(&reversed_table, vec![vec!["dac"], vec!["fft"]], "svr");
-
-    // 3. reduce paths to not have duplicates
-    starting_points = starting_points
-        .into_iter()
-        .filter(|hs| hs.contains(&"dac") && hs.contains(&"fft"))
-        .collect();
-    for col in starting_points.iter_mut() {
-        col.reverse();
-    }
-
-    // 4. run algorithm into the normal direction
-    let mut hs = HashMap::new();
-    let dac_count = starting_points
-        .iter()
-        .filter(|points| *points.last().unwrap() == "dac")
-        .count() as i64;
-    let fft_count = starting_points
-        .iter()
-        .filter(|points| *points.last().unwrap() == "fft")
-        .count() as i64;
-
-    if dac_count > 0 {
-        hs.insert("dac", dac_count);
-    }
-    if fft_count > 0 {
-        hs.insert("fft", fft_count);
-    }
-    let node_list = find_way_to_end_reducing(&table, hs, "out");
-
-    // 5. count
-    *node_list.get("out").unwrap()
 }
 
 fn build_reverse_table<'a>(
@@ -190,8 +223,7 @@ fn find_way_to_end_reducing<'a>(
 
 #[cfg(test)]
 mod tests {
-    use super::solve_a;
-    use super::solve_b;
+    use super::*;
 
     const TEST_INPUT: &str = "aaa: you hhh
 you: bbb ccc

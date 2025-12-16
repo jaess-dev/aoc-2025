@@ -14,7 +14,7 @@ fn main() {
 
     let aocs: Vec<AocDayData> = vec![
         // day12(),
-        // day11(),
+        day11(),
         day10(),
         day9(),
         day8(),

@@ -13,7 +13,7 @@ fn main() {
     banner();
 
     let aocs: Vec<AocDayData> = vec![
-        day12(),
+        // day12(),
         // day11(),
         day10(),
         day9(),
